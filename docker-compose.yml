@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+
+  grafana:
+    container_name: monitoring-grafana
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+
+    hostname: rpi-grafana
+    image: grafana/grafana:latest
+    networks:
+      - rpimonitor_default
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      # to be modified depending on your needs
+      - ./grafana/provisioning:/etc/grafana/provisioning
+
+  node-exporter:
+    container_name: monitoring-node-exporter    
+    expose:
+      - 9100
+    hostname: rpi-exporter
+    image: prom/node-exporter:latest
+    networks:
+      - rpimonitor_default
+    restart: unless-stopped
+
+  prometheus:
+    container_name: monitoring-prometheus
+    ports:
+      - 9090:9090
+    expose:
+      - 9090
+    hostname: rpi-prom
+    image: prom/prometheus:latest
+    networks:
+      - rpimonitor_default
+    restart: unless-stopped    
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+    
+networks:
+  rpimonitor_default:
