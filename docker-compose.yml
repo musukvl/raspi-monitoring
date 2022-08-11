@@ -8,9 +8,12 @@ services:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_LOG_MODE=console
 
     hostname: rpi-grafana
     image: grafana/grafana:latest
+    #user:
+    #  root
     networks:
       - rpimonitor_default
     ports:
@@ -18,7 +21,10 @@ services:
     restart: unless-stopped
     volumes:
       # to be modified depending on your needs
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning:/etc/grafana/provisioning:rw
+      #- ./grafana/data:/var/lib/grafana:rw
+      #- ./grafana/logs:/var/log/grafana:rw   
+      #- ./grafana/config:/grafana-config:rw
 
   node-exporter:
     container_name: monitoring-node-exporter    
