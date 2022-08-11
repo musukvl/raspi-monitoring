@@ -2,30 +2,6 @@ version: "3"
 
 services:
 
-  grafana:
-    container_name: monitoring-grafana
-    environment:
-      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin123
-      - GF_LOG_MODE=console
-
-    hostname: rpi-grafana
-    image: grafana/grafana:latest
-    #user:
-    #  root
-    networks:
-      - rpimonitor_default
-    ports:
-      - 3000:3000
-    restart: unless-stopped
-    volumes:
-      # to be modified depending on your needs
-      - ./grafana/provisioning:/etc/grafana/provisioning:rw
-      #- ./grafana/data:/var/lib/grafana:rw
-      #- ./grafana/logs:/var/log/grafana:rw   
-      #- ./grafana/config:/grafana-config:rw
-
   node-exporter:
     container_name: monitoring-node-exporter    
     expose:
@@ -49,7 +25,40 @@ services:
     restart: unless-stopped    
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
 
+  grafana:
+    container_name: monitoring-grafana
+    image: grafana/grafana:latest
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_LOG_MODE=console
+      - GF_USERS_ALLOW_SIGN_UP=false
+
+    hostname: rpi-grafana
+   
+    #user:
+    #  root
+    networks:
+      - rpimonitor_default
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - grafana_data:/var/lib/grafana
+      # to be modified depending on your needs
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      #- ./grafana/provisioning:/etc/grafana/provisioning:rw
+      #- ./grafana/data:/var/lib/grafana:rw
+      #- ./grafana/logs:/var/log/grafana:rw   
+      #- ./grafana/config:/grafana-config:rw
     
 networks:
   rpimonitor_default:
+
+
+volumes:
+  prometheus_data:
+  grafana_data:
